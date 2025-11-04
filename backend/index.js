@@ -1,24 +1,28 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
+import express from "express"
+import dotenv from "dotenv"
+dotenv.config()
+import connectDb from "./config/db.js"
+import authRouter from "./routes/auth.routes.js"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+import userRouter from "./routes/user.routes.js"
+import geminiResponse from "./gemini.js"
 
-dotenv.config();
 
-const app = express();
+const app=express()
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}))
+const port=process.env.PORT || 5000
+app.use(express.json())
+app.use(cookieParser())
+app.use("/api/auth",authRouter)
+app.use("/api/user",userRouter)
 
-// Middleware
-app.use(cors());
-app.use(express.json());
 
-// Basic route
-app.get("/", (req, res) => {
-  res.send("Server is running successfully 🚀");
-});
+app.listen(port,()=>{
+    connectDb()
+    console.log("server started")
+})
 
-// Choose port from .env or default to 5000
-const PORT = process.env.PORT || 5000;
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
